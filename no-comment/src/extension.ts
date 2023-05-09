@@ -1,8 +1,11 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import Authenticator from 'openai-token'; // eslint-disable-line
-import { ChatGPTUnofficialProxyAPI } from 'chatgpt';
+import { Configuration, OpenAIApi } from 'openai';
+
+const apiKey = process.env.OPENAI_API_KEY;
+const config = new Configuration({ apiKey });
+const api = new OpenAIApi(config);
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -20,14 +23,25 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 async function analyzeLine(line: string): Promise<string> {
-  const accessToken = process.env.OPENAI_ACCESS_TOKEN || '';
-  const api = new ChatGPTUnofficialProxyAPI({ accessToken });
-
   const prompt = `You are a programming assistant. You are given a code snippet to analyze. You are asked to write a comment for the code snippet. Summarize the code snippet in eight words or less. The code snippet is:\n\n${line}\n\nComment:`;
 
   try {
-    const response = await api.sendMessage(prompt);
-    return response.text;
+    const completion = await api.createCompletion({
+      model: 'gpt-3.5-turbo',
+      prompt,
+    });
+
+    if (!completion.data || !completion.data.choices) {
+      throw new Error('No completion data');
+    }
+
+    const comment = completion.data.choices[0].text?.trim();
+
+    if (!comment) {
+      throw new Error('No comment generated');
+    }
+
+    return comment;
   } catch (error) {
     console.error('API call failed:', error);
     vscode.window.showErrorMessage('Failed to insert comment');
