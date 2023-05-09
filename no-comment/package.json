@@ -9,15 +9,35 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:no-comment.insertComment"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "no-comment.helloWorld",
-        "title": "Hello World"
+        "command": "no-comment.insertComment",
+        "title": "Add AI generated comment"
       }
-    ]
+    ],
+    "keybindings": [
+      {
+        "command": "no-comment.insertComment",
+        "key": "Ctrl+Alt+C",
+        "mac": "cmd+alt+c",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "No Comment",
+      "properties": {
+        "no-comment.trigger": {
+          "type": "string",
+          "default": "",
+          "description": "A custom trigger string to activate GPT analysis and comment insertion. Leave empty to use only the keyboard shortcut."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -48,6 +68,8 @@
   },
   "dependencies": {
     "chatgpt": "^5.2.4",
+    "dotenv-webpack": "^8.0.1",
+    "openai": "^3.2.1",
     "openai-token": "^1.0.0"
   }
 }
