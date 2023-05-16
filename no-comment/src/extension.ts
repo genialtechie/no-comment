@@ -4,7 +4,11 @@ import * as vscode from 'vscode';
 import { Configuration, OpenAIApi } from 'openai';
 
 const apiKey = process.env.OPENAI_API_KEY;
-const config = new Configuration({ apiKey });
+const organization = process.env.OPENAI_ORG_ID;
+const config = new Configuration({
+  organization,
+  apiKey,
+});
 const api = new OpenAIApi(config);
 
 // This method is called when your extension is activated
@@ -27,25 +31,20 @@ async function analyzeLine(line: string): Promise<string> {
 
   try {
     const completion = await api.createCompletion({
-      model: 'gpt-3.5-turbo',
+      model: 'text-davinci-003',
       prompt,
     });
 
-    if (!completion.data || !completion.data.choices) {
-      throw new Error('No completion data');
-    }
-
     const comment = completion.data.choices[0].text?.trim();
 
-    if (!comment) {
+    if (!completion.data || !completion.data.choices || !comment) {
       throw new Error('No comment generated');
     }
 
     return comment;
   } catch (error) {
-    console.error('API call failed:', error);
     vscode.window.showErrorMessage('Failed to insert comment');
-    throw new Error('API call failed');
+    throw new Error(`API call failed: ${error}`);
   }
 }
 
