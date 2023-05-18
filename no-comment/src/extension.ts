@@ -27,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {}
 
 async function analyzeLine(line: string): Promise<string> {
-  const prompt = `You are a programming assistant. You are given a code snippet to analyze. You are asked to write a comment for the code snippet. Summarize the code snippet in eight words or less. The code snippet is:\n\n${line}\n\nComment:`;
+  const prompt = `You are a programming assistant. You are given a code snippet to analyze. You are asked to write a comment for the code snippet. Summarize the code snippet in eight words or less. The code snippet is:\n\n${line}\n\nComment:`; // Summarize code in 8 words.
 
   try {
     const completion = await api.createCompletion({
@@ -50,14 +50,15 @@ async function analyzeLine(line: string): Promise<string> {
 
 async function insertComment() {
   try {
-    const editor = vscode.window.activeTextEditor;
+    const editor = vscode.window.activeTextEditor; // Access active text editor in VSCode.
     if (!editor) {
+      // Check for editor object existence.
       vscode.window.showErrorMessage('No active editor');
-      throw new Error('No active editor');
+      throw new Error('No active editor'); // Throws an error for no active editor.
     }
 
-    const currentPos = editor.selection.active;
-    const currentLine = editor.document.lineAt(currentPos.line).text.trim();
+    const currentPos = editor.selection.active; // Moving editor cursor position.
+    const currentLine = editor.document.lineAt(currentPos.line).text.trim(); // Trim text of current line in editor.
 
     if (!currentLine) {
       vscode.window.showInformationMessage('No code on the current line');
