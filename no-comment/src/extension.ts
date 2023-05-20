@@ -67,6 +67,7 @@ async function insertComment() {
 
     const comment = await analyzeLine(currentLine);
     editor.edit((editBuilder) => {
+      // Modifies contents of editor.
       editBuilder.insert(currentPos, ` // ${comment}`);
     });
 
